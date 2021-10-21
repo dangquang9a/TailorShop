@@ -137,3 +137,18 @@ func (q *Queries) Listmeasures(ctx context.Context) ([]Measure, error) {
 	}
 	return items, nil
 }
+
+const updateMeasureNumber = `-- name: UpdateMeasureNumber :exec
+UPDATE measures SET number = $2
+WHERE code = $1
+`
+
+type UpdateMeasureNumberParams struct {
+	Code   int32          `json:"code"`
+	Number sql.NullString `json:"number"`
+}
+
+func (q *Queries) UpdateMeasureNumber(ctx context.Context, arg UpdateMeasureNumberParams) error {
+	_, err := q.db.ExecContext(ctx, updateMeasureNumber, arg.Code, arg.Number)
+	return err
+}

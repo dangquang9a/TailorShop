@@ -28,5 +28,5 @@ WHERE customer_id = $1;
 
 -- name: UpdateMeasureNumber :exec
 UPDATE measures SET number = $2
-WHERE id = $1;
+WHERE code = $1;
 
