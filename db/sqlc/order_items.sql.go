@@ -5,7 +5,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const creatOrderItem = `-- name: CreatOrderItem :one
@@ -15,18 +14,23 @@ INSERT INTO order_items (
   $1, $2
   
 )
-RETURNING order_id, product_id, quantity
+RETURNING id, order_id, product_id, quantity
 `
 
 type CreatOrderItemParams struct {
-	ProductID sql.NullInt32 `json:"productID"`
-	Quantity  sql.NullInt32 `json:"quantity"`
+	ProductID int32 `json:"productID"`
+	Quantity  int32 `json:"quantity"`
 }
 
 func (q *Queries) CreatOrderItem(ctx context.Context, arg CreatOrderItemParams) (OrderItem, error) {
 	row := q.db.QueryRowContext(ctx, creatOrderItem, arg.ProductID, arg.Quantity)
 	var i OrderItem
-	err := row.Scan(&i.OrderID, &i.ProductID, &i.Quantity)
+	err := row.Scan(
+		&i.ID,
+		&i.OrderID,
+		&i.ProductID,
+		&i.Quantity,
+	)
 	return i, err
 }
 
@@ -35,7 +39,7 @@ DELETE FROM order_items
 WHERE product_id = $1
 `
 
-func (q *Queries) DeletOrderItemByProductID(ctx context.Context, productID sql.NullInt32) error {
+func (q *Queries) DeletOrderItemByProductID(ctx context.Context, productID int32) error {
 	_, err := q.db.ExecContext(ctx, deletOrderItemByProductID, productID)
 	return err
 }
@@ -45,25 +49,30 @@ DELETE FROM order_items
 WHERE order_id = $1
 `
 
-func (q *Queries) DeleteOrderItem(ctx context.Context, orderID sql.NullInt32) error {
+func (q *Queries) DeleteOrderItem(ctx context.Context, orderID int32) error {
 	_, err := q.db.ExecContext(ctx, deleteOrderItem, orderID)
 	return err
 }
 
 const getOrderItem = `-- name: GetOrderItem :one
-SELECT order_id, product_id, quantity FROM order_items
+SELECT id, order_id, product_id, quantity FROM order_items
 WHERE order_id = $1 LIMIT 1
 `
 
-func (q *Queries) GetOrderItem(ctx context.Context, orderID sql.NullInt32) (OrderItem, error) {
+func (q *Queries) GetOrderItem(ctx context.Context, orderID int32) (OrderItem, error) {
 	row := q.db.QueryRowContext(ctx, getOrderItem, orderID)
 	var i OrderItem
-	err := row.Scan(&i.OrderID, &i.ProductID, &i.Quantity)
+	err := row.Scan(
+		&i.ID,
+		&i.OrderID,
+		&i.ProductID,
+		&i.Quantity,
+	)
 	return i, err
 }
 
 const listOrderItems = `-- name: ListOrderItems :many
-SELECT order_id, product_id, quantity FROM order_items
+SELECT id, order_id, product_id, quantity FROM order_items
 `
 
 func (q *Queries) ListOrderItems(ctx context.Context) ([]OrderItem, error) {
@@ -75,7 +84,12 @@ func (q *Queries) ListOrderItems(ctx context.Context) ([]OrderItem, error) {
 	var items []OrderItem
 	for rows.Next() {
 		var i OrderItem
-		if err := rows.Scan(&i.OrderID, &i.ProductID, &i.Quantity); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderID,
+			&i.ProductID,
+			&i.Quantity,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

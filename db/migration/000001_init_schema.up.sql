@@ -1,26 +1,27 @@
 CREATE TABLE "customers" (
   "id" SERIAL PRIMARY KEY,
-  "full_name" varchar,
+  "full_name" varchar NOT NULL,
   "created_at" timestamp DEFAULT (now()),
   "address" varchar,
-  "phone_number" varchar
+  "phone_number" varchar NOT NULL
 );
 
 CREATE TABLE "measures" (
-  "code" int PRIMARY KEY,
-  "customer_id" bigserial,
-  "name" varchar,
-  "number" varchar
+  "id" bigserial PRIMARY KEY NOT NULL,
+  "customer_id" bigserial NOT NULL,
+  "name" varchar NOT NULL,
+  "number" varchar NOT NULL
 );
 
 CREATE TABLE "order_items" (
-  "order_id" int,
-  "product_id" int,
-  "quantity" int DEFAULT 1
+  "id" bigserial UNIQUE NOT NULL,
+  "order_id" int UNIQUE NOT NULL,
+  "product_id" int UNIQUE NOT NULL,
+  "quantity" int NOT NULL DEFAULT 1
 );
 
 CREATE TABLE "orders" (
-  "id" int PRIMARY KEY,
+  "id" bigserial PRIMARY KEY NOT NULL,
   "user_id" int UNIQUE NOT NULL,
   "status" varchar,
   "prepaid" bigint,
@@ -28,13 +29,13 @@ CREATE TABLE "orders" (
 );
 
 CREATE TABLE "products_type" (
-  "id" int PRIMARY KEY,
-  "name" varchar
+  "id" int PRIMARY KEY NOT NULL,
+  "name" varchar NOT NULL
 );
 
 CREATE TABLE "products" (
-  "id" int PRIMARY KEY,
-  "name" varchar,
+  "id" bigserial UNIQUE PRIMARY KEY NOT NULL,
+  "name" varchar NOT NULL,
   "price" int NOT NULL,
   "type_id" int,
   "created_at" timestamp DEFAULT (now())
@@ -42,11 +43,9 @@ CREATE TABLE "products" (
 
 ALTER TABLE "measures" ADD FOREIGN KEY ("customer_id") REFERENCES "customers" ("id");
 
-ALTER TABLE "order_items" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
-
 ALTER TABLE "order_items" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
 
-ALTER TABLE "orders" ADD FOREIGN KEY ("user_id") REFERENCES "customers" ("id");
+ALTER TABLE "orders" ADD FOREIGN KEY ("id") REFERENCES "order_items" ("order_id");
 
 ALTER TABLE "products" ADD FOREIGN KEY ("type_id") REFERENCES "products_type" ("id");
 

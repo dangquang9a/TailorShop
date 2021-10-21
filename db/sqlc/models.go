@@ -8,21 +8,21 @@ import (
 
 type Customer struct {
 	ID          int32          `json:"id"`
-	FullName    sql.NullString `json:"fullName"`
+	FullName    string         `json:"fullName"`
 	CreatedAt   sql.NullTime   `json:"createdAt"`
 	Address     sql.NullString `json:"address"`
-	PhoneNumber sql.NullString `json:"phoneNumber"`
+	PhoneNumber string         `json:"phoneNumber"`
 }
 
 type Measure struct {
-	Code       int32          `json:"code"`
-	CustomerID sql.NullInt64  `json:"customerID"`
-	Name       sql.NullString `json:"name"`
-	Number     sql.NullString `json:"number"`
+	ID         int64  `json:"id"`
+	CustomerID int64  `json:"customerID"`
+	Name       string `json:"name"`
+	Number     string `json:"number"`
 }
 
 type Order struct {
-	ID      int32          `json:"id"`
+	ID      int64          `json:"id"`
 	UserID  int32          `json:"userID"`
 	Status  sql.NullString `json:"status"`
 	Prepaid sql.NullInt64  `json:"prepaid"`
@@ -31,14 +31,15 @@ type Order struct {
 }
 
 type OrderItem struct {
-	OrderID   sql.NullInt32 `json:"orderID"`
-	ProductID sql.NullInt32 `json:"productID"`
-	Quantity  sql.NullInt32 `json:"quantity"`
+	ID        int64 `json:"id"`
+	OrderID   int32 `json:"orderID"`
+	ProductID int32 `json:"productID"`
+	Quantity  int32 `json:"quantity"`
 }
 
 type Product struct {
-	ID   int32          `json:"id"`
-	Name sql.NullString `json:"name"`
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 	// must be positive
 	Price     int32         `json:"price"`
 	TypeID    sql.NullInt32 `json:"typeID"`
@@ -46,6 +47,6 @@ type Product struct {
 }
 
 type ProductsType struct {
-	ID   int32          `json:"id"`
-	Name sql.NullString `json:"name"`
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
 }

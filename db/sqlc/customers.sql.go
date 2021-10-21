@@ -18,9 +18,9 @@ RETURNING id, full_name, created_at, address, phone_number
 `
 
 type CreateCustomerParams struct {
-	FullName    sql.NullString `json:"fullName"`
+	FullName    string         `json:"fullName"`
 	Address     sql.NullString `json:"address"`
-	PhoneNumber sql.NullString `json:"phoneNumber"`
+	PhoneNumber string         `json:"phoneNumber"`
 }
 
 func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) (Customer, error) {
@@ -67,10 +67,17 @@ func (q *Queries) GetCustomer(ctx context.Context, id int32) (Customer, error) {
 const listCustomers = `-- name: ListCustomers :many
 SELECT id, full_name, created_at, address, phone_number FROM Customers
 ORDER BY full_name
+LIMIT $1
+OFFSET $2
 `
 
-func (q *Queries) ListCustomers(ctx context.Context) ([]Customer, error) {
-	rows, err := q.db.QueryContext(ctx, listCustomers)
+type ListCustomersParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListCustomers(ctx context.Context, arg ListCustomersParams) ([]Customer, error) {
+	rows, err := q.db.QueryContext(ctx, listCustomers, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -96,4 +103,35 @@ func (q *Queries) ListCustomers(ctx context.Context) ([]Customer, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateCustomer = `-- name: UpdateCustomer :one
+UPDATE Customers SET address = $2, full_name = $3, phone_number = $4
+WHERE id = $1
+RETURNING id, full_name, created_at, address, phone_number
+`
+
+type UpdateCustomerParams struct {
+	ID          int32          `json:"id"`
+	Address     sql.NullString `json:"address"`
+	FullName    string         `json:"fullName"`
+	PhoneNumber string         `json:"phoneNumber"`
+}
+
+func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) (Customer, error) {
+	row := q.db.QueryRowContext(ctx, updateCustomer,
+		arg.ID,
+		arg.Address,
+		arg.FullName,
+		arg.PhoneNumber,
+	)
+	var i Customer
+	err := row.Scan(
+		&i.ID,
+		&i.FullName,
+		&i.CreatedAt,
+		&i.Address,
+		&i.PhoneNumber,
+	)
+	return i, err
 }

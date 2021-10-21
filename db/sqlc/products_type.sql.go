@@ -5,7 +5,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createProductsType = `-- name: CreateProductsType :one
@@ -17,7 +16,7 @@ INSERT INTO products_type (
 RETURNING id, name
 `
 
-func (q *Queries) CreateProductsType(ctx context.Context, name sql.NullString) (ProductsType, error) {
+func (q *Queries) CreateProductsType(ctx context.Context, name string) (ProductsType, error) {
 	row := q.db.QueryRowContext(ctx, createProductsType, name)
 	var i ProductsType
 	err := row.Scan(&i.ID, &i.Name)

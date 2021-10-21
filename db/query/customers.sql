@@ -4,7 +4,9 @@ WHERE id = $1 LIMIT 1;
 
 -- name: ListCustomers :many
 SELECT * FROM Customers
-ORDER BY full_name;
+ORDER BY full_name
+LIMIT $1
+OFFSET $2;
 
 -- name: CreateCustomer :one
 INSERT INTO Customers (
@@ -17,3 +19,8 @@ RETURNING *;
 -- name: DeleteCustomer :exec
 DELETE FROM Customers
 WHERE id = $1;
+
+-- name: UpdateCustomer :one
+UPDATE Customers SET address = $2, full_name = $3, phone_number = $4
+WHERE id = $1
+RETURNING *;
