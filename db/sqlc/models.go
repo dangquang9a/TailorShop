@@ -15,14 +15,14 @@ type Customer struct {
 }
 
 type Measure struct {
-	ID         int64  `json:"id"`
+	ID         int32  `json:"id"`
 	CustomerID int64  `json:"customerID"`
 	Name       string `json:"name"`
 	Number     string `json:"number"`
 }
 
 type Order struct {
-	ID      int64          `json:"id"`
+	ID      int32          `json:"id"`
 	UserID  int32          `json:"userID"`
 	Status  sql.NullString `json:"status"`
 	Prepaid sql.NullInt64  `json:"prepaid"`
@@ -31,14 +31,14 @@ type Order struct {
 }
 
 type OrderItem struct {
-	ID        int64 `json:"id"`
+	ID        int32 `json:"id"`
 	OrderID   int32 `json:"orderID"`
 	ProductID int32 `json:"productID"`
 	Quantity  int32 `json:"quantity"`
 }
 
 type Product struct {
-	ID   int64  `json:"id"`
+	ID   int32  `json:"id"`
 	Name string `json:"name"`
 	// must be positive
 	Price     int32         `json:"price"`

@@ -72,3 +72,21 @@ func (q *Queries) ListProductsTypes(ctx context.Context) ([]ProductsType, error)
 	}
 	return items, nil
 }
+
+const updateProductType = `-- name: UpdateProductType :one
+UPDATE products_type SET name = $2
+WHERE id = $1
+RETURNING id, name
+`
+
+type UpdateProductTypeParams struct {
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
+}
+
+func (q *Queries) UpdateProductType(ctx context.Context, arg UpdateProductTypeParams) (ProductsType, error) {
+	row := q.db.QueryRowContext(ctx, updateProductType, arg.ID, arg.Name)
+	var i ProductsType
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}

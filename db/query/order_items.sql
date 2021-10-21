@@ -22,3 +22,7 @@ WHERE order_id = $1;
 DELETE FROM order_items
 WHERE product_id = $1;
 
+-- name: UpdateOderItem :one
+UPDATE order_items SET order_id = $2, product_id = $3, quantity = $4
+WHERE id = $1
+RETURNING *;

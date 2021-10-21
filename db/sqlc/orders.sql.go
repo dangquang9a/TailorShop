@@ -42,7 +42,7 @@ DELETE FROM Orders
 WHERE id = $1
 `
 
-func (q *Queries) DeleteOrder(ctx context.Context, id int64) error {
+func (q *Queries) DeleteOrder(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteOrder, id)
 	return err
 }
@@ -52,7 +52,7 @@ SELECT id, user_id, status, prepaid, created_at FROM Orders
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetOrder(ctx context.Context, id int64) (Order, error) {
+func (q *Queries) GetOrder(ctx context.Context, id int32) (Order, error) {
 	row := q.db.QueryRowContext(ctx, getOrder, id)
 	var i Order
 	err := row.Scan(

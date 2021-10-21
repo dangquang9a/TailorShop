@@ -17,3 +17,8 @@ RETURNING *;
 -- name: DeleteProductsType :exec
 DELETE FROM products_type
 WHERE id = $1;
+
+-- name: UpdateProductType :one
+UPDATE products_type SET name = $2
+WHERE id = $1
+RETURNING *;

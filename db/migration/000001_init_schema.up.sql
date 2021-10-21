@@ -1,5 +1,5 @@
 CREATE TABLE "customers" (
-  "id" SERIAL PRIMARY KEY,
+  "id" SERIAL UNIQUE PRIMARY KEY NOT NULL,
   "full_name" varchar NOT NULL,
   "created_at" timestamp DEFAULT (now()),
   "address" varchar,
@@ -7,34 +7,34 @@ CREATE TABLE "customers" (
 );
 
 CREATE TABLE "measures" (
-  "id" bigserial PRIMARY KEY NOT NULL,
+  "id" SERIAL UNIQUE PRIMARY KEY NOT NULL,
   "customer_id" bigserial NOT NULL,
   "name" varchar NOT NULL,
   "number" varchar NOT NULL
 );
 
 CREATE TABLE "order_items" (
-  "id" bigserial UNIQUE NOT NULL,
+  "id" SERIAL UNIQUE PRIMARY KEY NOT NULL,
   "order_id" int UNIQUE NOT NULL,
   "product_id" int UNIQUE NOT NULL,
   "quantity" int NOT NULL DEFAULT 1
 );
 
 CREATE TABLE "orders" (
-  "id" bigserial PRIMARY KEY NOT NULL,
-  "user_id" int UNIQUE NOT NULL,
+  "id" SERIAL UNIQUE PRIMARY KEY NOT NULL,
+  "user_id" int NOT NULL,
   "status" varchar,
   "prepaid" bigint,
   "created_at" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "products_type" (
-  "id" int PRIMARY KEY NOT NULL,
+  "id" SERIAL UNIQUE PRIMARY KEY NOT NULL,
   "name" varchar NOT NULL
 );
 
 CREATE TABLE "products" (
-  "id" bigserial UNIQUE PRIMARY KEY NOT NULL,
+  "id" SERIAL UNIQUE PRIMARY KEY NOT NULL,
   "name" varchar NOT NULL,
   "price" int NOT NULL,
   "type_id" int,

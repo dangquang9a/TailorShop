@@ -18,3 +18,8 @@ RETURNING *;
 -- name: DeleteOrder :exec
 DELETE FROM Orders
 WHERE id = $1;
+
+-- name: UpdateOder :one
+UPDATE Orders SET user_id = $2, status = $3, prepaid = $4
+WHERE id = $1
+RETURNING *;

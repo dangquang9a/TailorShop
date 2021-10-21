@@ -49,7 +49,7 @@ DELETE FROM measures
 WHERE id = $1
 `
 
-func (q *Queries) DeleteMeasureByID(ctx context.Context, id int64) error {
+func (q *Queries) DeleteMeasureByID(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteMeasureByID, id)
 	return err
 }
@@ -92,7 +92,7 @@ SELECT id, customer_id, name, number FROM measures
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetMeasureByID(ctx context.Context, id int64) (Measure, error) {
+func (q *Queries) GetMeasureByID(ctx context.Context, id int32) (Measure, error) {
 	row := q.db.QueryRowContext(ctx, getMeasureByID, id)
 	var i Measure
 	err := row.Scan(
@@ -143,7 +143,7 @@ WHERE id = $1
 `
 
 type UpdateMeasureNumberParams struct {
-	ID     int64  `json:"id"`
+	ID     int32  `json:"id"`
 	Number string `json:"number"`
 }
 

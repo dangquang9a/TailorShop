@@ -1,5 +1,0 @@
-package db
-
-func abc() {
-
-}

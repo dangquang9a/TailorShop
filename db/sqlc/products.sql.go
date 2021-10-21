@@ -41,7 +41,7 @@ DELETE FROM Products
 WHERE id = $1
 `
 
-func (q *Queries) DeleteProduct(ctx context.Context, id int64) error {
+func (q *Queries) DeleteProduct(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteProduct, id)
 	return err
 }
@@ -51,7 +51,7 @@ SELECT id, name, price, type_id, created_at FROM products
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetProducts(ctx context.Context, id int64) (Product, error) {
+func (q *Queries) GetProducts(ctx context.Context, id int32) (Product, error) {
 	row := q.db.QueryRowContext(ctx, getProducts, id)
 	var i Product
 	err := row.Scan(
