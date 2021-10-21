@@ -1,0 +1,19 @@
+-- name: GetProductsType :one
+SELECT * FROM products_type
+WHERE id = $1 LIMIT 1;
+
+-- name: ListProductsTypes :many
+SELECT * FROM products_type
+ORDER BY name;
+
+-- name: CreateProductsType :one
+INSERT INTO products_type (
+  name
+) VALUES (
+  $1
+)
+RETURNING *;
+
+-- name: DeleteProductsType :exec
+DELETE FROM products_type
+WHERE id = $1;

@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS measures;
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS products_type;
+DROP TABLE IF EXISTS products;
