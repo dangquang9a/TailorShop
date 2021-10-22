@@ -4,7 +4,6 @@ import (
 	"TailorShop/util"
 	"context"
 	"database/sql"
-	"fmt"
 	"testing"
 	"time"
 
@@ -18,7 +17,7 @@ func TestCreateCustomer(t *testing.T) {
 func createRandomCustomer(t *testing.T) Customer {
 	arg := CreateCustomerParams{
 		FullName:    util.RandomString(30),
-		Address:     sql.NullString{util.RandomString(30), true},
+		Address:     sql.NullString{String: util.RandomString(30), Valid: true},
 		PhoneNumber: util.RandomString(30),
 	}
 	customer, err := testQueries.CreateCustomer(context.Background(), arg)
@@ -54,12 +53,28 @@ func TestGetCustomer(t *testing.T) {
 	require.WithinDuration(t, customer1.CreatedAt.Time, customer2.CreatedAt.Time, time.Second)
 }
 
+func TestGetCustomerByPhone(t *testing.T) {
+	customer1 := createRandomCustomer(t)
+	customer2, err := testQueries.GetCustomerByPhone(context.Background(), customer1.PhoneNumber)
+
+	require.NoError(t, err)
+	require.NotEmpty(t, customer2)
+
+	require.Equal(t, customer1.ID, customer2.ID)
+	require.Equal(t, customer1.Address, customer2.Address)
+	require.Equal(t, customer1.FullName, customer2.FullName)
+	require.Equal(t, customer1.PhoneNumber, customer2.PhoneNumber)
+	require.Equal(t, customer1.CreatedAt, customer2.CreatedAt)
+
+	require.WithinDuration(t, customer1.CreatedAt.Time, customer2.CreatedAt.Time, time.Second)
+}
+
 func TestUpdateCustomer(t *testing.T) {
 	customer1 := createRandomCustomer(t)
 	arg := UpdateCustomerParams{
 		ID:          customer1.ID,
 		FullName:    util.RandomString(30),
-		Address:     sql.NullString{util.RandomString(30), true},
+		Address:     sql.NullString{String: util.RandomString(30), Valid: true},
 		PhoneNumber: util.RandomString(10),
 	}
 
@@ -90,9 +105,6 @@ func TestDeleteCustomer(t *testing.T) {
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, customer2)
-
-	err2 := testQueries.DeleteCustomer(context.Background(), 4)
-	fmt.Println(err2)
 }
 
 func TestListCustomer(t *testing.T) {

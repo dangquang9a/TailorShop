@@ -45,9 +45,11 @@ ALTER TABLE "measures" ADD FOREIGN KEY ("customer_id") REFERENCES "customers" ("
 
 ALTER TABLE "order_items" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
 
-ALTER TABLE "orders" ADD FOREIGN KEY ("id") REFERENCES "order_items" ("order_id");
+ALTER TABLE "order_items" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
 
 ALTER TABLE "products" ADD FOREIGN KEY ("type_id") REFERENCES "products_type" ("id");
+
+ALTER TABLE "orders" ADD FOREIGN KEY ("user_id") REFERENCES "customers" ("id");
 
 CREATE INDEX ON "customers" ("full_name");
 

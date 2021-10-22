@@ -64,6 +64,24 @@ func (q *Queries) GetCustomer(ctx context.Context, id int32) (Customer, error) {
 	return i, err
 }
 
+const getCustomerByPhone = `-- name: GetCustomerByPhone :one
+SELECT id, full_name, created_at, address, phone_number FROM customers
+WHERE phone_number = $1 LIMIT 1
+`
+
+func (q *Queries) GetCustomerByPhone(ctx context.Context, phoneNumber string) (Customer, error) {
+	row := q.db.QueryRowContext(ctx, getCustomerByPhone, phoneNumber)
+	var i Customer
+	err := row.Scan(
+		&i.ID,
+		&i.FullName,
+		&i.CreatedAt,
+		&i.Address,
+		&i.PhoneNumber,
+	)
+	return i, err
+}
+
 const listCustomers = `-- name: ListCustomers :many
 SELECT id, full_name, created_at, address, phone_number FROM Customers
 ORDER BY full_name

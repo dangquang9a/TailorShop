@@ -65,13 +65,21 @@ func (q *Queries) GetOrder(ctx context.Context, id int32) (Order, error) {
 	return i, err
 }
 
-const listOrders = `-- name: ListOrders :many
+const getOrderByUserId = `-- name: GetOrderByUserId :many
 SELECT id, user_id, status, prepaid, created_at FROM Orders
-ORDER BY created_at
+WHERE user_id = $3
+LIMIT $1
+OFFSET $2
 `
 
-func (q *Queries) ListOrders(ctx context.Context) ([]Order, error) {
-	rows, err := q.db.QueryContext(ctx, listOrders)
+type GetOrderByUserIdParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+	UserID int32 `json:"userID"`
+}
+
+func (q *Queries) GetOrderByUserId(ctx context.Context, arg GetOrderByUserIdParams) ([]Order, error) {
+	rows, err := q.db.QueryContext(ctx, getOrderByUserId, arg.Limit, arg.Offset, arg.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -97,4 +105,76 @@ func (q *Queries) ListOrders(ctx context.Context) ([]Order, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const listOrders = `-- name: ListOrders :many
+SELECT id, user_id, status, prepaid, created_at FROM Orders
+ORDER BY created_at
+LIMIT $1
+OFFSET $2
+`
+
+type ListOrdersParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order, error) {
+	rows, err := q.db.QueryContext(ctx, listOrders, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Order
+	for rows.Next() {
+		var i Order
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Status,
+			&i.Prepaid,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateOder = `-- name: UpdateOder :one
+UPDATE Orders SET user_id = $2, status = $3, prepaid = $4
+WHERE id = $1
+RETURNING id, user_id, status, prepaid, created_at
+`
+
+type UpdateOderParams struct {
+	ID      int32          `json:"id"`
+	UserID  int32          `json:"userID"`
+	Status  sql.NullString `json:"status"`
+	Prepaid sql.NullInt64  `json:"prepaid"`
+}
+
+func (q *Queries) UpdateOder(ctx context.Context, arg UpdateOderParams) (Order, error) {
+	row := q.db.QueryRowContext(ctx, updateOder,
+		arg.ID,
+		arg.UserID,
+		arg.Status,
+		arg.Prepaid,
+	)
+	var i Order
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Status,
+		&i.Prepaid,
+		&i.CreatedAt,
+	)
+	return i, err
 }

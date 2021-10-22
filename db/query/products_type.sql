@@ -4,7 +4,9 @@ WHERE id = $1 LIMIT 1;
 
 -- name: ListProductsTypes :many
 SELECT * FROM products_type
-ORDER BY name;
+ORDER BY name
+LIMIT $1
+OFFSET $2;
 
 -- name: CreateProductsType :one
 INSERT INTO products_type (

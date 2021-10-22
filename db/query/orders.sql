@@ -2,9 +2,17 @@
 SELECT * FROM Orders
 WHERE id = $1 LIMIT 1;
 
+-- name: GetOrderByUserId :many
+SELECT * FROM Orders
+WHERE user_id = $3
+LIMIT $1
+OFFSET $2;
+
 -- name: ListOrders :many
 SELECT * FROM Orders
-ORDER BY created_at;
+ORDER BY created_at
+LIMIT $1
+OFFSET $2;
 
 -- name: CreateOrder :one
 INSERT INTO Orders (

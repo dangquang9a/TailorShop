@@ -48,10 +48,17 @@ func (q *Queries) GetProductsType(ctx context.Context, id int32) (ProductsType, 
 const listProductsTypes = `-- name: ListProductsTypes :many
 SELECT id, name FROM products_type
 ORDER BY name
+LIMIT $1
+OFFSET $2
 `
 
-func (q *Queries) ListProductsTypes(ctx context.Context) ([]ProductsType, error) {
-	rows, err := q.db.QueryContext(ctx, listProductsTypes)
+type ListProductsTypesParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListProductsTypes(ctx context.Context, arg ListProductsTypesParams) ([]ProductsType, error) {
+	rows, err := q.db.QueryContext(ctx, listProductsTypes, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

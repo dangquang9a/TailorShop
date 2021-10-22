@@ -7,23 +7,24 @@ import (
 	"context"
 )
 
-const creatOrderItem = `-- name: CreatOrderItem :one
+const createOrderItem = `-- name: CreateOrderItem :one
 INSERT INTO order_items (
-  product_id, quantity
+  product_id, quantity, order_id
 ) VALUES (
-  $1, $2
+  $1, $2, $3
   
 )
 RETURNING id, order_id, product_id, quantity
 `
 
-type CreatOrderItemParams struct {
+type CreateOrderItemParams struct {
 	ProductID int32 `json:"productID"`
 	Quantity  int32 `json:"quantity"`
+	OrderID   int32 `json:"orderID"`
 }
 
-func (q *Queries) CreatOrderItem(ctx context.Context, arg CreatOrderItemParams) (OrderItem, error) {
-	row := q.db.QueryRowContext(ctx, creatOrderItem, arg.ProductID, arg.Quantity)
+func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams) (OrderItem, error) {
+	row := q.db.QueryRowContext(ctx, createOrderItem, arg.ProductID, arg.Quantity, arg.OrderID)
 	var i OrderItem
 	err := row.Scan(
 		&i.ID,
@@ -34,33 +35,23 @@ func (q *Queries) CreatOrderItem(ctx context.Context, arg CreatOrderItemParams) 
 	return i, err
 }
 
-const deletOrderItemByProductID = `-- name: DeletOrderItemByProductID :exec
-DELETE FROM order_items
-WHERE product_id = $1
-`
-
-func (q *Queries) DeletOrderItemByProductID(ctx context.Context, productID int32) error {
-	_, err := q.db.ExecContext(ctx, deletOrderItemByProductID, productID)
-	return err
-}
-
 const deleteOrderItem = `-- name: DeleteOrderItem :exec
 DELETE FROM order_items
-WHERE order_id = $1
+WHERE id = $1
 `
 
-func (q *Queries) DeleteOrderItem(ctx context.Context, orderID int32) error {
-	_, err := q.db.ExecContext(ctx, deleteOrderItem, orderID)
+func (q *Queries) DeleteOrderItem(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteOrderItem, id)
 	return err
 }
 
 const getOrderItem = `-- name: GetOrderItem :one
 SELECT id, order_id, product_id, quantity FROM order_items
-WHERE order_id = $1 LIMIT 1
+WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetOrderItem(ctx context.Context, orderID int32) (OrderItem, error) {
-	row := q.db.QueryRowContext(ctx, getOrderItem, orderID)
+func (q *Queries) GetOrderItem(ctx context.Context, id int32) (OrderItem, error) {
+	row := q.db.QueryRowContext(ctx, getOrderItem, id)
 	var i OrderItem
 	err := row.Scan(
 		&i.ID,
@@ -73,10 +64,17 @@ func (q *Queries) GetOrderItem(ctx context.Context, orderID int32) (OrderItem, e
 
 const listOrderItems = `-- name: ListOrderItems :many
 SELECT id, order_id, product_id, quantity FROM order_items
+LIMIT $1
+OFFSET $2
 `
 
-func (q *Queries) ListOrderItems(ctx context.Context) ([]OrderItem, error) {
-	rows, err := q.db.QueryContext(ctx, listOrderItems)
+type ListOrderItemsParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListOrderItems(ctx context.Context, arg ListOrderItemsParams) ([]OrderItem, error) {
+	rows, err := q.db.QueryContext(ctx, listOrderItems, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -101,4 +99,75 @@ func (q *Queries) ListOrderItems(ctx context.Context) ([]OrderItem, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const listOrderItemsByOrderId = `-- name: ListOrderItemsByOrderId :many
+SELECT id, order_id, product_id, quantity FROM order_items
+WHERE order_id = $3
+LIMIT $1
+OFFSET $2
+`
+
+type ListOrderItemsByOrderIdParams struct {
+	Limit   int32 `json:"limit"`
+	Offset  int32 `json:"offset"`
+	OrderID int32 `json:"orderID"`
+}
+
+func (q *Queries) ListOrderItemsByOrderId(ctx context.Context, arg ListOrderItemsByOrderIdParams) ([]OrderItem, error) {
+	rows, err := q.db.QueryContext(ctx, listOrderItemsByOrderId, arg.Limit, arg.Offset, arg.OrderID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []OrderItem
+	for rows.Next() {
+		var i OrderItem
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderID,
+			&i.ProductID,
+			&i.Quantity,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateOderItem = `-- name: UpdateOderItem :one
+UPDATE order_items SET order_id = $2, product_id = $3, quantity = $4
+WHERE id = $1
+RETURNING id, order_id, product_id, quantity
+`
+
+type UpdateOderItemParams struct {
+	ID        int32 `json:"id"`
+	OrderID   int32 `json:"orderID"`
+	ProductID int32 `json:"productID"`
+	Quantity  int32 `json:"quantity"`
+}
+
+func (q *Queries) UpdateOderItem(ctx context.Context, arg UpdateOderItemParams) (OrderItem, error) {
+	row := q.db.QueryRowContext(ctx, updateOderItem,
+		arg.ID,
+		arg.OrderID,
+		arg.ProductID,
+		arg.Quantity,
+	)
+	var i OrderItem
+	err := row.Scan(
+		&i.ID,
+		&i.OrderID,
+		&i.ProductID,
+		&i.Quantity,
+	)
+	return i, err
 }

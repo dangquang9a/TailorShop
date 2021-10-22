@@ -56,11 +56,19 @@ func (q *Queries) DeleteMeasureByID(ctx context.Context, id int32) error {
 
 const getMeasureByCustomerID = `-- name: GetMeasureByCustomerID :many
 SELECT id, customer_id, name, number FROM measures
-WHERE customer_id = $1 LIMIT 1
+WHERE customer_id = $3
+LIMIT $1
+OFFSET $2
 `
 
-func (q *Queries) GetMeasureByCustomerID(ctx context.Context, customerID int64) ([]Measure, error) {
-	rows, err := q.db.QueryContext(ctx, getMeasureByCustomerID, customerID)
+type GetMeasureByCustomerIDParams struct {
+	Limit      int32 `json:"limit"`
+	Offset     int32 `json:"offset"`
+	CustomerID int64 `json:"customerID"`
+}
+
+func (q *Queries) GetMeasureByCustomerID(ctx context.Context, arg GetMeasureByCustomerIDParams) ([]Measure, error) {
+	rows, err := q.db.QueryContext(ctx, getMeasureByCustomerID, arg.Limit, arg.Offset, arg.CustomerID)
 	if err != nil {
 		return nil, err
 	}
@@ -107,10 +115,17 @@ func (q *Queries) GetMeasureByID(ctx context.Context, id int32) (Measure, error)
 const listmeasures = `-- name: Listmeasures :many
 SELECT id, customer_id, name, number FROM measures
 ORDER BY name
+LIMIT $1
+OFFSET $2
 `
 
-func (q *Queries) Listmeasures(ctx context.Context) ([]Measure, error) {
-	rows, err := q.db.QueryContext(ctx, listmeasures)
+type ListmeasuresParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) Listmeasures(ctx context.Context, arg ListmeasuresParams) ([]Measure, error) {
+	rows, err := q.db.QueryContext(ctx, listmeasures, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -137,9 +152,10 @@ func (q *Queries) Listmeasures(ctx context.Context) ([]Measure, error) {
 	return items, nil
 }
 
-const updateMeasureNumber = `-- name: UpdateMeasureNumber :exec
+const updateMeasureNumber = `-- name: UpdateMeasureNumber :one
 UPDATE measures SET number = $2
 WHERE id = $1
+RETURNING id, customer_id, name, number
 `
 
 type UpdateMeasureNumberParams struct {
@@ -147,7 +163,14 @@ type UpdateMeasureNumberParams struct {
 	Number string `json:"number"`
 }
 
-func (q *Queries) UpdateMeasureNumber(ctx context.Context, arg UpdateMeasureNumberParams) error {
-	_, err := q.db.ExecContext(ctx, updateMeasureNumber, arg.ID, arg.Number)
-	return err
+func (q *Queries) UpdateMeasureNumber(ctx context.Context, arg UpdateMeasureNumberParams) (Measure, error) {
+	row := q.db.QueryRowContext(ctx, updateMeasureNumber, arg.ID, arg.Number)
+	var i Measure
+	err := row.Scan(
+		&i.ID,
+		&i.CustomerID,
+		&i.Name,
+		&i.Number,
+	)
+	return i, err
 }

@@ -2,6 +2,10 @@
 SELECT * FROM customers
 WHERE id = $1 LIMIT 1;
 
+-- name: GetCustomerByPhone :one
+SELECT * FROM customers
+WHERE phone_number = $1 LIMIT 1;
+
 -- name: ListCustomers :many
 SELECT * FROM Customers
 ORDER BY full_name

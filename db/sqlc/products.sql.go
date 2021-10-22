@@ -67,10 +67,17 @@ func (q *Queries) GetProducts(ctx context.Context, id int32) (Product, error) {
 const listProducts = `-- name: ListProducts :many
 SELECT id, name, price, type_id, created_at FROM Products
 ORDER BY name
+LIMIT $1
+OFFSET $2
 `
 
-func (q *Queries) ListProducts(ctx context.Context) ([]Product, error) {
-	rows, err := q.db.QueryContext(ctx, listProducts)
+type ListProductsParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error) {
+	rows, err := q.db.QueryContext(ctx, listProducts, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -96,4 +103,35 @@ func (q *Queries) ListProducts(ctx context.Context) ([]Product, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateProduct = `-- name: UpdateProduct :one
+UPDATE Products SET name = $2, price = $3, type_id = $4
+WHERE id = $1
+RETURNING id, name, price, type_id, created_at
+`
+
+type UpdateProductParams struct {
+	ID     int32         `json:"id"`
+	Name   string        `json:"name"`
+	Price  int32         `json:"price"`
+	TypeID sql.NullInt32 `json:"typeID"`
+}
+
+func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error) {
+	row := q.db.QueryRowContext(ctx, updateProduct,
+		arg.ID,
+		arg.Name,
+		arg.Price,
+		arg.TypeID,
+	)
+	var i Product
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Price,
+		&i.TypeID,
+		&i.CreatedAt,
+	)
+	return i, err
 }

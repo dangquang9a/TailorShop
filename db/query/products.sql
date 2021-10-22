@@ -4,7 +4,9 @@ WHERE id = $1 LIMIT 1;
 
 -- name: ListProducts :many
 SELECT * FROM Products
-ORDER BY name;
+ORDER BY name
+LIMIT $1
+OFFSET $2;
 
 -- name: CreateProduct :one
 INSERT INTO products (
@@ -19,6 +21,6 @@ DELETE FROM Products
 WHERE id = $1;
 
 -- name: UpdateProduct :one
-UPDATE Customers SET name = $2, price = $3, type_id = $4
+UPDATE Products SET name = $2, price = $3, type_id = $4
 WHERE id = $1
 RETURNING *;
