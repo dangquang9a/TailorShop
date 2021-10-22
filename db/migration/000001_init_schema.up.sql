@@ -15,8 +15,8 @@ CREATE TABLE "measures" (
 
 CREATE TABLE "order_items" (
   "id" SERIAL UNIQUE PRIMARY KEY NOT NULL,
-  "order_id" int UNIQUE NOT NULL,
-  "product_id" int UNIQUE NOT NULL,
+  "order_id" int NOT NULL,
+  "product_id" int NOT NULL,
   "quantity" int NOT NULL DEFAULT 1
 );
 
