@@ -15,7 +15,7 @@ jobs:
       postgres:
         image: postgres:14
         env:
-          POSTGRES_USER: root
+          POSTGRES_USER: merlin
           POSTGRES_PASSWORD: "@merlin123"
           POSTGRES_DB: tailor_shop
         ports:
