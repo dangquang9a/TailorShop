@@ -1,3 +1,6 @@
+include app.env
+export
+
 network:
 	docker network create tailorshop-network
 
@@ -11,10 +14,10 @@ dropdb:
 	docker exec -it postgres14 dropdb tailor_shop
 
 migrateup:
-	migrate -path db/migration -database "postgresql://merlin:@merlin123@localhost:5432/tailor_shop?sslmode=disable" -verbose up
+	migrate -path db/migration -database "${DB_SOURCE}" -verbose up
 
 migratedown:
-	migrate -path db/migration -database "postgresql://merlin:@merlin123@localhost:5432/tailor_shop?sslmode=disable" -verbose down
+	migrate -path db/migration -database "${DB_SOURCE}" -verbose down
 
 server:
 	go run main.go

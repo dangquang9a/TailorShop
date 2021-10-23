@@ -13,11 +13,6 @@ import (
 var testQueries *Queries
 var testDB *sql.DB
 
-// const (
-// 	dbDriver = "postgres"
-// 	dbSource = "postgresql://merlin:@merlin123@10.0.0.223:5432/tailor_shop?sslmode=disable"
-// )
-
 func TestMain(m *testing.M) {
 	config, err := util.LoadConfig("../..")
 	if err != nil {

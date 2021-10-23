@@ -10,12 +10,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// const (
-// 	dbDriver      = "postgres"
-// 	dbSource      = "postgresql://merlin:@merlin123@10.0.0.223:5432/tailor_shop?sslmode=disable"
-// 	serverAddress = "localhost:8080"
-// )
-
 func main() {
 	config, err := util.LoadConfig(".")
 	if err != nil {
