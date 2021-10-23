@@ -8,7 +8,7 @@ WHERE phone_number = $1 LIMIT 1;
 
 -- name: ListCustomers :many
 SELECT * FROM Customers
-ORDER BY full_name
+ORDER BY id
 LIMIT $1
 OFFSET $2;
 

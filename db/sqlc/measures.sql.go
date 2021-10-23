@@ -73,7 +73,7 @@ func (q *Queries) GetMeasureByCustomerID(ctx context.Context, arg GetMeasureByCu
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Measure
+	items := []Measure{}
 	for rows.Next() {
 		var i Measure
 		if err := rows.Scan(
@@ -130,7 +130,7 @@ func (q *Queries) Listmeasures(ctx context.Context, arg ListmeasuresParams) ([]M
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Measure
+	items := []Measure{}
 	for rows.Next() {
 		var i Measure
 		if err := rows.Scan(

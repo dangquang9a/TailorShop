@@ -84,7 +84,7 @@ func (q *Queries) GetCustomerByPhone(ctx context.Context, phoneNumber string) (C
 
 const listCustomers = `-- name: ListCustomers :many
 SELECT id, full_name, created_at, address, phone_number FROM Customers
-ORDER BY full_name
+ORDER BY id
 LIMIT $1
 OFFSET $2
 `
@@ -100,7 +100,7 @@ func (q *Queries) ListCustomers(ctx context.Context, arg ListCustomersParams) ([
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Customer
+	items := []Customer{}
 	for rows.Next() {
 		var i Customer
 		if err := rows.Scan(

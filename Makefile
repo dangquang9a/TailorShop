@@ -11,11 +11,16 @@ dropdb:
 	docker exec -it postgres12 dropdb tailor_shop
 
 migrateup:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/tailor_shop?sslmode=disable" -verbose up
+	migrate -path db/migration -database "postgresql://merlin:@merlin123@10.0.0.223:5432/tailor_shop?sslmode=disable" -verbose up
 
 migratedown:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/tailor_shop?sslmode=disable" -verbose down
+	migrate -path db/migration -database "postgresql://merlin:@merlin123@10.0.0.223:5432/tailor_shop?sslmode=disable" -verbose down
 
-
+server:
+	go run main.go
+test:
+	go test -v -cover ./...
 sqlc:
 	sqlc generate
+
+.PHONY: network postgres createdb dropdb migrateup migratedown sqlc server
