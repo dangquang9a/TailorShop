@@ -13,6 +13,14 @@ createdb:
 dropdb:
 	docker exec -it postgres14 dropdb tailor_shop
 
+install_migrate_amd64:
+	curl -L https://github.com/golang-migrate/migrate/releases/download/v4.12.2/migrate.linux-amd64.tar.gz | tar xvz
+	mv migrate.linux-amd64 /usr/bin/migrate
+
+install_migrate_arm64:
+	curl -L https://github.com/golang-migrate/migrate/releases/download/v4.12.2/migrate.linux-arm64.tar.gz | tar xvz
+	mv migrate.linux-arm64 /usr/bin/migrate
+
 migrateup:
 	migrate -path db/migration -database "${DB_SOURCE}" -verbose up
 
