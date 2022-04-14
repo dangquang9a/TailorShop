@@ -10,5 +10,6 @@ COPY . .
 RUN go build -v main.go
 RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.12.2/migrate.linux-arm64.tar.gz | tar xvz
 RUN mv migrate.linux-arm64 /usr/bin/migrate
+RUN make migrate up
 EXPOSE 8080 8080
 CMD ["/usr/src/app/main"]
