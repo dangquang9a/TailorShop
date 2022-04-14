@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     services:
       postgres:
@@ -37,14 +37,14 @@ jobs:
       - name: Build
         run: go build -v ./...
       - name: Install golang-migrate
-        run: make install_migrate_amd64
+        run: make install_migrate_arm64
       - name: Run migrations
         run: make migrateup
       - name: Test
         run: go test -v ./...
   sonarcloud:
     name: SonarCloud
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
         with:
