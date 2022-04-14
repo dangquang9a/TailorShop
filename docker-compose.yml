@@ -9,6 +9,8 @@ services:
       - "5432:5432"
     volumes:
       - data:/var/lib/postgresql/data
+    networks:
+      - tailorshop_network
   server:
     build:
       context: .
@@ -17,10 +19,12 @@ services:
     depends_on:
       - database
     networks:
-      - tailorshop
+      - tailorshop_network
     ports:
     - "8080:8080"
 volumes:
   data:
 networks:
-  tailorshop
+  tailorshop_network:
+    name: tailorshop_network
+    driver: bridge
