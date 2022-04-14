@@ -139,7 +139,7 @@ func TestUpdateOrderItem(t *testing.T) {
 	arg := UpdateOderItemParams{
 		ID:        order_item1.ID,
 		ProductID: createRandomProduct(t).ID,
-		Quantity:  int32(util.RandomInt(0, 10)),
+		Quantity:  int32(util.RandomInt(0, 100)),
 		OrderID:   createRandomOrder(t).ID,
 	}
 
