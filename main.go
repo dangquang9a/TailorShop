@@ -16,6 +16,9 @@ func main() {
 		log.Fatal("cannot load config:", err)
 	}
 
+	// DBSource := config.DBDriver + "://" + config.DBUser + ":" + config.DBPassword + "@" + config.DBHost + ":" + config.DBPort + "/" + config.DBName + "?sslmode=disable"
+	// DBSource := "postgres://merlin:%40merlin123@152.69.215.50:5432/app"
+	// conn, err := sql.Open(config.DBDriver, config.DBSource)
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatal("Cannot connect to database:", err)
